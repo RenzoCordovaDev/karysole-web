@@ -1,30 +1,26 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllProductSlugs, getProductBySlug } from "@/lib/products";
 import { getCategoryLabel } from "@/lib/categories";
 import { AddToCartSection } from "@/components/AddToCartSection";
+import { ProductSkeleton } from "@/components/ProductSkeleton";
+
+type ProductParams = Promise<{ slug: string }>;
 
 export async function generateStaticParams() {
   const slugs = await getAllProductSlugs();
   return slugs;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: ProductParams }): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   return { title: product ? `${product.name} — KARYSOLÉ` : "KARYSOLÉ" };
 }
 
-export default async function ProductPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+async function ProductContent({ params }: { params: ProductParams }) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) notFound();
@@ -32,7 +28,7 @@ export default async function ProductPage({
   const hasDiscount = Boolean(product.compareAtPrice && product.compareAtPrice > product.price);
 
   return (
-    <div className="max-w-6xl mx-auto px-5 md:px-10 py-8">
+    <>
       <nav className="text-[13px] text-muted flex items-center gap-2 mb-6 flex-wrap" aria-label="Migas de pan">
         <Link href="/">Inicio</Link>
         <span>›</span>
@@ -66,6 +62,16 @@ export default async function ProductPage({
           <AddToCartSection product={product} />
         </div>
       </div>
+    </>
+  );
+}
+
+export default function ProductPage({ params }: { params: ProductParams }) {
+  return (
+    <div className="max-w-6xl mx-auto px-5 md:px-10 py-8">
+      <Suspense fallback={<ProductSkeleton />}>
+        <ProductContent params={params} />
+      </Suspense>
     </div>
   );
 }
