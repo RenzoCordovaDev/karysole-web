@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import type { ReactNode } from "react";
-import "./globals.css";
+import "../globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartProvider } from "@/lib/cart";

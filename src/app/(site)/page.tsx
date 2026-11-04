@@ -1,13 +1,43 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/categories";
 import { getFeaturedProducts } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { HeroSlider } from "@/components/HeroSlider";
+import { Skeleton } from "@/components/Skeleton";
 
-export default async function HomePage() {
+async function FeaturedProducts() {
   const products = await getFeaturedProducts(4);
 
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+}
+
+function FeaturedProductsSkeleton() {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="bg-white rounded-2xl overflow-hidden border border-line">
+          <Skeleton className="aspect-square w-full rounded-none" />
+          <div className="p-4 flex flex-col gap-2">
+            <Skeleton className="h-3 w-14" />
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-12" />
+            <Skeleton className="h-11 w-full mt-2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function HomePage() {
   return (
     <>
       {/* Hero */}
@@ -54,11 +84,9 @@ export default async function HomePage() {
             Ver todo →
           </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <Suspense fallback={<FeaturedProductsSkeleton />}>
+          <FeaturedProducts />
+        </Suspense>
       </section>
 
       {/* Categories */}

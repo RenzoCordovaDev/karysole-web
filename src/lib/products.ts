@@ -2,7 +2,7 @@ import { supabase } from "./supabase";
 import { sampleProducts } from "./sample-products";
 import type { CategorySlug, Product } from "./types";
 
-interface ProductRow {
+export interface ProductRow {
   id: string;
   slug: string;
   name: string;
@@ -17,7 +17,7 @@ interface ProductRow {
   created_at: string;
 }
 
-function mapRow(row: ProductRow): Product {
+export function mapRow(row: ProductRow): Product {
   return {
     id: row.id,
     slug: row.slug,
